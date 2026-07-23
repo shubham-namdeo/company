@@ -41,8 +41,24 @@ const getResponseErrorMessage = (error: any, defaultMessage: string) => {
     return responseData._ERROR_MESSAGE_;
   }
 
+  if(typeof responseData?.error?.message === "string" && responseData.error.message.trim()) {
+    return responseData.error.message;
+  }
+
+  if(typeof responseData?.errorMessage === "string" && responseData.errorMessage.trim()) {
+    return responseData.errorMessage;
+  }
+
+  if(typeof responseData?.error === "string" && responseData.error.trim()) {
+    return responseData.error;
+  }
+
   if (typeof responseData?.message === "string" && responseData.message.trim()) {
     return responseData.message;
+  }
+
+  if(typeof error?.errorMessage === "string" && error.errorMessage.trim()) {
+    return error.errorMessage;
   }
 
   if (typeof error?.message === "string" && error.message.trim()) {
@@ -51,10 +67,17 @@ const getResponseErrorMessage = (error: any, defaultMessage: string) => {
 
   return defaultMessage;
 }
+const customSort = (list: any[], customValues: string[], sortParameter: string) => {
+  return [...list].sort((first: any, second: any) => {
+    const firstVal = customValues.indexOf(first[sortParameter]);
+    const secondVal = customValues.indexOf(second[sortParameter]);
+    return secondVal - firstVal;
+  });
+}
+
 const generateInternalId = (name: string) => {
   return name.trim().toUpperCase().split(' ').join('_');
 }
-
 
 const getDownloadFileContent = (data: any) => {
   const fileContent = data?.csvData ?? data?.fileData ?? data?.data ?? data;
@@ -116,4 +139,4 @@ const parseDateTimeValue = (value: string | number) => {
   return candidates.find((candidate) => candidate.isValid) || null;
 }
 
-export { generateInternalId, getResponseErrorMessage, hasError, showToast, getCurrentTime, getDownloadFileContent, downloadTextFile, formatDateTime, parseDateTimeValue }
+export { customSort, generateInternalId, getResponseErrorMessage, hasError, showToast, getCurrentTime, getDownloadFileContent, downloadTextFile, formatDateTime, parseDateTimeValue }

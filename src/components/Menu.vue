@@ -8,7 +8,7 @@
 
     <ion-content>
       <ion-list id="company-list">
-        <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
+        <ion-menu-toggle v-for="(p, i) in appPages" :key="i" :auto-hide="false">
           <ion-item button router-direction="root" :router-link="p.url" class="hydrated" :class="{ selected: selectedIndex === i }">
             <ion-icon slot="start" :ios="p.iosIcon" :md="p.mdIcon" />
             <ion-label>{{ p.title }}</ion-label>
@@ -16,10 +16,43 @@
         </ion-menu-toggle>
 
         <ion-item-divider color="light">
+          <ion-label>{{ translate("Integrations") }}</ion-label>
+        </ion-item-divider>
+
+        <ion-menu-toggle v-for="(p, i) in integrationPages" :key="'integration-' + i" :auto-hide="false">
+          <ion-item button router-direction="root" :router-link="p.url" class="hydrated" :class="{ selected: selectedIntegrationIndex === i }">
+            <ion-icon slot="start" :ios="p.iosIcon" :md="p.mdIcon" />
+            <ion-label>{{ translate(p.title) }}</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <ion-item-divider color="light">
+          <ion-label>{{ translate("Facilities") }}</ion-label>
+        </ion-item-divider>
+
+        <ion-menu-toggle :auto-hide="false" v-for="(p, i) in facilitiesPages" :key="'facilities-' + i">
+          <ion-item button router-direction="root" :router-link="p.url" class="hydrated" :class="{ selected: selectedFacilitiesIndex === i }">
+            <ion-icon slot="start" :ios="p.iosIcon" :md="p.mdIcon" />
+            <ion-label>{{ translate(p.title) }}</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <ion-item-divider color="light">
+          <ion-label>{{ translate("Users") }}</ion-label>
+        </ion-item-divider>
+
+        <ion-menu-toggle v-for="(p, i) in visibleUserPages" :key="'user-' + i" :auto-hide="false">
+          <ion-item button router-direction="root" :router-link="p.url" class="hydrated" :class="{ selected: selectedUserIndex === i }">
+            <ion-icon slot="start" :ios="p.iosIcon" :md="p.mdIcon" />
+            <ion-label>{{ translate(p.title) }}</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <ion-item-divider color="light">
           <ion-label>{{ translate("Agents") }}</ion-label>
         </ion-item-divider>
 
-        <ion-menu-toggle :auto-hide="false" v-for="(p, i) in agentPages" :key="'agent-' + i">
+        <ion-menu-toggle v-for="(p, i) in agentPages" :key="'agent-' + i" :auto-hide="false">
           <ion-item button router-direction="root" :router-link="p.url" class="hydrated" :class="{ selected: selectedAgentIndex === i }">
             <ion-icon slot="start" :ios="p.iosIcon" :md="p.mdIcon" />
             <ion-label>{{ translate(p.title) }}</ion-label>
@@ -30,7 +63,7 @@
           <ion-label>{{ translate("Settings") }}</ion-label>
         </ion-item-divider>
 
-        <ion-menu-toggle :auto-hide="false" v-for="(p, i) in settingsPages" :key="'settings-' + i">
+        <ion-menu-toggle v-for="(p, i) in settingsPages" :key="'settings-' + i" :auto-hide="false">
           <ion-item button router-direction="root" :router-link="p.url" class="hydrated" :class="{ selected: selectedSettingsIndex === i }">
             <ion-icon slot="start" :ios="p.iosIcon" :md="p.mdIcon" />
             <ion-label>{{ translate(p.title) }}</ion-label>
@@ -42,26 +75,28 @@
 </template>
 
 <script setup lang="ts">
+import { translate } from "@common";
+import { useAuth } from "@common/composables/useAuth";
 import {
   IonContent,
-  IonIcon,
   IonHeader,
+  IonIcon,
   IonItem,
   IonItemDivider,
   IonLabel,
   IonList,
-  IonTitle,
-  IonToolbar,
   IonMenu,
   IonMenuToggle,
+  IonTitle,
+  IonToolbar,
 } from "@ionic/vue";
+import { airplaneOutline, albumsOutline, briefcaseOutline, businessOutline, carOutline, cartOutline, keyOutline, mailOutline, peopleOutline, schoolOutline, settingsOutline, shieldCheckmarkOutline, storefrontOutline, walletOutline } from "ionicons/icons";
 import { computed } from "vue";
-import { airplaneOutline, briefcaseOutline, businessOutline, cartOutline, mailOutline, schoolOutline, settingsOutline, walletOutline } from "ionicons/icons";
-import { useAuth } from '@common/composables/useAuth';
 import router from "@/router";
-import { translate } from '@common';
+import { useUserStore } from "@/store/user";
 
 const { isAuthenticated } = useAuth();
+const userStore = useUserStore();
 const appPages = [
   {
     title: "Product Store",
@@ -70,6 +105,9 @@ const appPages = [
     iosIcon: businessOutline,
     mdIcon: businessOutline,
   },
+];
+
+const integrationPages = [
   {
     title: "Shopify",
     url: "/shopify",
@@ -97,8 +135,57 @@ const appPages = [
     childRoutes: ["/netsuite/"],
     iosIcon: walletOutline,
     mdIcon: walletOutline
+  },
+];
+
+const userPages = [
+  {
+    title: "Users",
+    url: "/users",
+    childRoutes: ["/user-details/", "/create-user", "/user-confirmation/", "/user-quick-setup/"],
+    permission: "USERS_LIST_VIEW OR PARTYMGR_VIEW OR PARTYMGR_ADMIN",
+    iosIcon: peopleOutline,
+    mdIcon: peopleOutline,
+  },
+  {
+    title: "Security Groups",
+    url: "/security-groups",
+    childRoutes: ["/security-group-detail/"],
+    permission: "SECURITY_VIEW OR SECURITY_ADMIN",
+    iosIcon: keyOutline,
+    mdIcon: keyOutline,
+  },
+  {
+    title: "App Permissions",
+    url: "/app-permissions",
+    permission: "APP_PERMISSION_VIEW OR APP_PERMISSION_CREATE OR APP_PERMISSION_UPDATE OR SECURITY_ADMIN",
+    iosIcon: shieldCheckmarkOutline,
+    mdIcon: shieldCheckmarkOutline,
   }
 ];
+
+const facilitiesPages = [
+  {
+    title: "Find",
+    url: "/facilities/find",
+    iosIcon: storefrontOutline,
+    mdIcon: storefrontOutline,
+  },
+  {
+    title: "Groups",
+    url: "/facilities/groups",
+    iosIcon: albumsOutline,
+    mdIcon: albumsOutline,
+  },
+  {
+    title: "Parking",
+    url: "/parking",
+    iosIcon: carOutline,
+    mdIcon: carOutline,
+  }
+];
+
+const visibleUserPages = computed(() => userPages.filter((screen) => userStore.hasPermission(screen.permission)))
 
 const agentPages = [
   {
@@ -126,16 +213,36 @@ const settingsPages = [
 
 const selectedIndex = computed(() => {
   const path = router.currentRoute.value.path
+
   return appPages.findIndex((screen) => screen.url === path || screen.childRoutes?.includes(path) || screen.childRoutes?.some((route) => path.includes(route)))
+})
+
+const selectedFacilitiesIndex = computed(() => {
+  const path = router.currentRoute.value.path
+  return facilitiesPages.findIndex((screen) => screen.url === path)
 })
 
 const selectedAgentIndex = computed(() => {
   const path = router.currentRoute.value.path
+
   return agentPages.findIndex((screen) => screen.url === path)
+})
+
+const selectedIntegrationIndex = computed(() => {
+  const path = router.currentRoute.value.path
+
+  return integrationPages.findIndex((screen) => screen.url === path || screen.childRoutes?.includes(path) || screen.childRoutes?.some((route) => path.includes(route)))
+})
+
+const selectedUserIndex = computed(() => {
+  const path = router.currentRoute.value.path
+
+  return visibleUserPages.value.findIndex((screen) => screen.url === path || screen.childRoutes?.includes(path) || screen.childRoutes?.some((route) => path.includes(route)))
 })
 
 const selectedSettingsIndex = computed(() => {
   const path = router.currentRoute.value.path
+
   return settingsPages.findIndex((screen) => screen.url === path)
 })
 </script>
